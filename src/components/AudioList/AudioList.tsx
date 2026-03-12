@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FlatList } from "react-native";
+import { FlatList, Text } from "react-native";
 
 import { useLoadAudio } from "@hooks";
 
@@ -12,7 +12,12 @@ import styles from "./AudioList.styles";
 const AudioList = () => {
   const [play, setPlay] = useState<TPlay>(null);
 
-  const { audioFiles, loadMore } = useLoadAudio();
+  const { audioFiles, error, loadMore } = useLoadAudio();
+
+  // TODO: обработать нормально
+  if (error) {
+    return <Text style={{ color: "#fff" }}>Error</Text>;
+  }
 
   const handlerPlay = (newPlay: TPlay) => setPlay(newPlay);
 
@@ -22,7 +27,7 @@ const AudioList = () => {
       keyExtractor={(item) => item.id}
       style={styles.lists}
       renderItem={({ item }) => (
-        <Track play={play} tarck={item} onPlay={handlerPlay} />
+        <Track play={play} track={item} onPlay={handlerPlay} />
       )}
       onEndReached={loadMore}
       onEndReachedThreshold={0.5}

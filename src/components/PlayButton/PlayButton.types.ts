@@ -10,7 +10,7 @@ interface IPlayButtonProps {
   iconStopSize?: IIconSize;
   iconPlaySize?: IIconSize;
   styleButton?: StyleProp<ViewStyle>;
-  onPress?: (setIsPlay: any) => void;
+  onPress?: () => void;
 }
 
 export { IPlayButtonProps };

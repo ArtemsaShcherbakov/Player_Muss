@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: "100%",
+    borderRadius: 100,
     backgroundColor: "#D9D9D9",
   },
 });

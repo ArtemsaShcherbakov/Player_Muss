@@ -3,7 +3,7 @@ import { type Asset } from "expo-media-library";
 
 import { PlayButton } from "@components/PlayButton";
 
-import { formatDate } from "@utils";
+import { formatDuration } from "@utils";
 
 import type { TPlay } from "@types";
 
@@ -13,18 +13,18 @@ import styles from "./Track.styles";
 
 interface ITrackProps {
   play: TPlay;
-  tarck: Asset;
+  track: Asset;
   onPlay(newPlay: TPlay): void;
 }
 
 const Track = ({
   play,
-  tarck: { id, filename, duration },
+  track: { id, filename, duration },
   onPlay,
 }: ITrackProps) => {
   const isPlay = play?.id === id ? play?.isPlay : false;
-  const nameTrack = filename.slice(0, 32).split("-")[0];
-  const durationTrack = `${formatDate(duration)} мин`;
+  const nameTrack = filename.slice(0, 32).split("-")[0].replaceAll("_", " ");
+  const durationTrack = formatDuration(duration);
 
   const handlerPressPlay = () => {
     if (id === play?.id) {
