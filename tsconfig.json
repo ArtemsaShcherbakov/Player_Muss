@@ -4,7 +4,7 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["./src/components/*"],
+      "@components": ["./src/components/index"],
       "@assets/*": ["./assets/*"],
       "@hooks": ["src/hooks/index"],
       "@utils": ["src/utils/index"],

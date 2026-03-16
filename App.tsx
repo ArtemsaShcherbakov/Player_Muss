@@ -1,8 +1,17 @@
+import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
+import { setAudioModeAsync } from "expo-audio";
 
 import { AudioList } from "./src/components";
 
 const App = () => {
+  useEffect(() => {
+    setAudioModeAsync({
+      playsInSilentMode: true,
+      shouldPlayInBackground: true,
+    });
+  }, []);
+
   return (
     <View style={styles.container}>
       <AudioList />
