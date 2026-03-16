@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Text, View } from "react-native";
+import { Animated, View } from "react-native";
 
-interface Props {
+interface IMarqueeTextProps {
   text: string;
   width: number;
 }
 
-const MarqueeText = ({ text, width }: Props) => {
-  const translateX = useRef(new Animated.Value(0)).current;
-
+const MarqueeText = ({ text, width }: IMarqueeTextProps) => {
   const [textWidth, setTextWidth] = useState(0);
+
+  const translateX = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!textWidth) return;
@@ -37,7 +37,6 @@ const MarqueeText = ({ text, width }: Props) => {
         onLayout={(e) => setTextWidth(e.nativeEvent.layout.width)}
         style={{
           transform: [{ translateX }],
-          whiteSpace: "nowrap",
         }}
       >
         {text}

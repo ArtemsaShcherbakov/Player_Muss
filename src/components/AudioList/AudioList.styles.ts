@@ -12,7 +12,6 @@ export default StyleSheet.create({
   modalView: {
     width: "100%",
     gap: 15,
-    // flexDirection: "column",
     margin: 20,
     backgroundColor: "#605d5d",
     borderRadius: 15,

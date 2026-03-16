@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
-import { FlatList, Text } from "react-native";
+import { FlatList } from "react-native";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 
 import { useLoadAudio } from "@hooks";
+
 import { Track, StatusBar } from "./compnents";
+
+import { ICurrentTrack, TCurrentTrack } from "./AudioList.types";
 
 import styles from "./AudioList.styles";
 
@@ -11,9 +14,9 @@ const AudioList = () => {
   const player = useAudioPlayer(null);
   const status = useAudioPlayerStatus(player);
 
-  const [currentTrack, setCurrentTrack] = useState<any>(null);
+  const [currentTrack, setCurrentTrack] = useState<TCurrentTrack>(null);
 
-  const { audioFiles, error, loadMore } = useLoadAudio();
+  const { audioFiles, loadMore } = useLoadAudio();
 
   useEffect(() => {
     if (status.didJustFinish) {
@@ -21,11 +24,11 @@ const AudioList = () => {
     }
   }, [status.playing]);
 
-  if (error) {
-    return <Text style={{ color: "#fff" }}>Error</Text>;
-  }
+  // if (error) {
+  //   return <Text style={{ color: "#fff" }}>Error</Text>;
+  // }
 
-  const handlePlay = (id: string, filename: string, uri: string) => {
+  const handlePlay = ({ id, filename, uri }: ICurrentTrack) => {
     if (currentTrack?.id === id) {
       if (player.playing) {
         player.pause();
@@ -42,18 +45,23 @@ const AudioList = () => {
       return;
     }
 
-    setCurrentTrack({ id, filename, isPlay: true });
+    setCurrentTrack({ id, filename, uri, isPlay: true });
 
     player.replace(uri);
     player.play();
   };
 
   const switchTrack = (step: number) => {
-    const index = audioFiles.findIndex(({ id }) => id === currentTrack.id);
+    const index = audioFiles.findIndex(({ id }) => id === currentTrack?.id);
 
     if (!index) return;
 
-    setCurrentTrack({ id: audioFiles[index + step].id, isPlay: true });
+    setCurrentTrack({
+      id: audioFiles[index + step].id,
+      filename: audioFiles[index + step].filename,
+      uri: audioFiles[index + step].uri,
+      isPlay: true,
+    });
 
     player.replace(audioFiles[index + step].uri);
     player.play();
@@ -67,10 +75,7 @@ const AudioList = () => {
         style={styles.lists}
         renderItem={({ item }) => (
           <Track
-            id={item.id}
-            uri={item.uri}
-            filename={item.filename}
-            duration={item.duration}
+            track={item}
             isPlaying={
               currentTrack?.id === item.id ? currentTrack.isPlay : false
             }
@@ -80,7 +85,6 @@ const AudioList = () => {
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
       />
-
       <StatusBar
         currentTrack={currentTrack}
         switchTrack={switchTrack}
