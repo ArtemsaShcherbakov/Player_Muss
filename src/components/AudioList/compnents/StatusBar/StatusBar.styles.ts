@@ -1,7 +1,11 @@
 import { StyleSheet } from "react-native";
 
-export default StyleSheet.create({
-  lists: { marginTop: 50, marginBottom: 45 },
+export const styles = StyleSheet.create({
+  root: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+  },
   centeredView: {
     width: "100%",
     flex: 1,
@@ -15,7 +19,8 @@ export default StyleSheet.create({
     margin: 20,
     backgroundColor: "#605d5d",
     borderRadius: 15,
-    padding: 5,
+    paddingTop: 10,
+    paddingBottom: 10,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -26,14 +31,14 @@ export default StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-
+  controls: {
+    flexDirection: "row",
+    gap: 20,
+    alignItems: "center",
+  },
   textStyle: {
     fontWeight: "bold",
     textAlign: "center",
     color: "#d2cdcd",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
   },
 });

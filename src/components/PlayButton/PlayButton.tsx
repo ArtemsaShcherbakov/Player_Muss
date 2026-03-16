@@ -1,4 +1,4 @@
-import { TouchableOpacity } from "react-native";
+import { Button } from "@components";
 
 import PlayIcon from "@assets/icons/Play.svg";
 import StopIcon from "@assets/icons/Stop.svg";
@@ -9,8 +9,6 @@ import {
 } from "./PlayButton.constants";
 
 import { IPlayButtonProps } from "./PlayButton.types";
-
-import { styles } from "./PlayButton.styles";
 
 const PlayButton = ({
   play,
@@ -25,11 +23,7 @@ const PlayButton = ({
     <PlayIcon {...iconPlaySize} />
   );
 
-  return (
-    <TouchableOpacity onPress={onPress} style={[styles.button, styleButton]}>
-      {icon}
-    </TouchableOpacity>
-  );
+  return <Button icon={icon} styleButton={styleButton} onPress={onPress} />;
 };
 
 export { PlayButton };

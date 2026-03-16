@@ -1,5 +1,5 @@
 interface IPlay {
-  id: string;
+  id: number;
   isPlay: boolean;
 }
 
