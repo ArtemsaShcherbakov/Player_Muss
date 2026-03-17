@@ -7,7 +7,6 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    marginBottom: 25,
   },
   modalView: {
     width: "100%",

@@ -2,9 +2,10 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   root: {
-    position: "absolute",
+    position: "relative",
     bottom: 0,
     width: "100%",
+    height: 134,
   },
   centeredView: {
     width: "100%",

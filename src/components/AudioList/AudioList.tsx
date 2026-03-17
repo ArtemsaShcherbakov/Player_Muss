@@ -1,12 +1,16 @@
-import { useState, useEffect } from "react";
-import { FlatList } from "react-native";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import {
+  FlatList,
+  useWindowDimensions,
+  type LayoutChangeEvent,
+} from "react-native";
+import type { Asset } from "expo-media-library";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 
 import { useLoadAudio } from "@hooks";
-
 import { Track, StatusBar } from "./compnents";
 
-import { ICurrentTrack, TCurrentTrack } from "./AudioList.types";
+import type { ICurrentTrack, TCurrentTrack } from "./AudioList.types";
 
 import styles from "./AudioList.styles";
 
@@ -14,81 +18,135 @@ const AudioList = () => {
   const player = useAudioPlayer(null);
   const status = useAudioPlayerStatus(player);
 
+  const { height } = useWindowDimensions();
+
   const [currentTrack, setCurrentTrack] = useState<TCurrentTrack>(null);
+  const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
 
   const { audioFiles, loadMore } = useLoadAudio();
+
+  const currentTrackRef = useRef<TCurrentTrack>(null);
+
+  const hasCurrentTrack = currentTrack !== null;
+
+  const listStyle = useMemo(() => {
+    const listHeight = height - statusBarHeight;
+
+    return currentTrack
+      ? [
+          styles.lists,
+          {
+            height: listHeight,
+            marginBottom: 0,
+          },
+        ]
+      : styles.lists;
+  }, [hasCurrentTrack, statusBarHeight, height]);
+
+  useEffect(() => {
+    currentTrackRef.current = currentTrack;
+  }, [currentTrack]);
 
   useEffect(() => {
     if (status.didJustFinish) {
       switchTrack(1);
     }
-  }, [status.playing]);
+  }, [status.didJustFinish]);
 
-  // if (error) {
-  //   return <Text style={{ color: "#fff" }}>Error</Text>;
-  // }
+  const handlePlay = useCallback(
+    ({ id, filename, uri }: ICurrentTrack) => {
+      const current = currentTrackRef.current;
 
-  const handlePlay = ({ id, filename, uri }: ICurrentTrack) => {
-    if (currentTrack?.id === id) {
-      if (player.playing) {
-        player.pause();
+      if (current?.id === id) {
+        if (player.playing) {
+          player.pause();
+          setCurrentTrack({ ...current, isPlay: false });
+          return;
+        }
 
-        setCurrentTrack({ ...currentTrack, isPlay: false });
-
+        player.play();
+        setCurrentTrack({ ...current, isPlay: true });
         return;
       }
 
+      const newTrack = { id, filename, uri, isPlay: true };
+
+      setCurrentTrack(newTrack);
+
+      player.replace(uri);
       player.play();
+    },
+    [player],
+  );
 
-      setCurrentTrack({ ...currentTrack, isPlay: true });
+  const switchTrack = useCallback(
+    (step: number) => {
+      const current = currentTrackRef.current;
 
-      return;
-    }
+      const index = audioFiles.findIndex(({ id }) => id === current?.id);
 
-    setCurrentTrack({ id, filename, uri, isPlay: true });
+      if (index === -1) return;
 
-    player.replace(uri);
-    player.play();
-  };
+      const newIndex = index + step;
 
-  const switchTrack = (step: number) => {
-    const index = audioFiles.findIndex(({ id }) => id === currentTrack?.id);
+      if (newIndex < 0 || newIndex >= audioFiles.length) return;
 
-    if (!index) return;
+      const nextTrack = audioFiles[newIndex];
 
-    setCurrentTrack({
-      id: audioFiles[index + step].id,
-      filename: audioFiles[index + step].filename,
-      uri: audioFiles[index + step].uri,
-      isPlay: true,
-    });
+      const newTrack = {
+        id: nextTrack.id,
+        filename: nextTrack.filename,
+        uri: nextTrack.uri,
+        isPlay: true,
+      };
 
-    player.replace(audioFiles[index + step].uri);
-    player.play();
-  };
+      setCurrentTrack(newTrack);
+
+      player.replace(nextTrack.uri);
+      player.play();
+    },
+    [audioFiles, player],
+  );
+
+  const handleStatusBarLayout = useCallback((event: LayoutChangeEvent) => {
+    setStatusBarHeight(event.nativeEvent.layout.height);
+  }, []);
+
+  const renderItem = useCallback(
+    ({ item }: { item: Asset }) => {
+      const isPlaying =
+        currentTrack?.id === item.id ? currentTrack?.isPlay : false;
+
+      return (
+        <Track
+          track={item}
+          isPlaying={isPlaying || false}
+          onPlay={handlePlay}
+        />
+      );
+    },
+    [currentTrack, handlePlay],
+  );
 
   return (
     <>
       <FlatList
         data={audioFiles}
         keyExtractor={(item) => item.id}
-        style={styles.lists}
-        renderItem={({ item }) => (
-          <Track
-            track={item}
-            isPlaying={
-              currentTrack?.id === item.id ? currentTrack.isPlay : false
-            }
-            onPlay={handlePlay}
-          />
-        )}
+        renderItem={renderItem}
+        style={listStyle}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
+        windowSize={10}
+        initialNumToRender={12}
+        maxToRenderPerBatch={12}
+        removeClippedSubviews
       />
       <StatusBar
         currentTrack={currentTrack}
         switchTrack={switchTrack}
         onPlay={handlePlay}
+        onStatusBarLayout={handleStatusBarLayout}
       />
     </>
   );
