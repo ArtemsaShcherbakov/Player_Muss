@@ -1,7 +1,8 @@
+import { memo, useCallback, useMemo } from "react";
 import { View, Text, TouchableHighlight } from "react-native";
-import { Asset } from "expo-media-library";
+import type { Asset } from "expo-media-library";
 
-import { PlayButton } from "@components";
+import { PlayButton } from "../PlayButton";
 
 import { formatDuration } from "@utils";
 
@@ -17,16 +18,31 @@ interface ITrackProps {
   onPlay(currentTrack: Omit<ICurrentTrack, "isPlay">): void;
 }
 
-const Track = ({ track, isPlaying, onPlay }: ITrackProps) => {
+export const Track = memo(({ track, isPlaying, onPlay }: ITrackProps) => {
   const { id, uri, filename, duration } = track;
-  const nameTrack = filename.slice(0, 32).split("-")[0].replaceAll("_", " ");
-  const durationTrack = formatDuration(duration);
 
-  const handlerPressPlay = () => onPlay({ id, filename, uri });
+  const nameTrack = useMemo(
+    () => filename.slice(0, 32).split("-")[0].replaceAll("_", " "),
+    [filename],
+  );
+
+  const durationTrack = useMemo(() => formatDuration(duration), [duration]);
+
+  const tarckContainer = useMemo(
+    () =>
+      isPlaying
+        ? [styles.track, { backgroundColor: "#5a5454", borderRadius: 10 }]
+        : styles.track,
+    [isPlaying],
+  );
+
+  const handlerPressPlay = useCallback(() => {
+    onPlay({ id, filename: nameTrack, uri });
+  }, [id, nameTrack, uri, onPlay]);
 
   return (
     <TouchableHighlight onPress={handlerPressPlay}>
-      <View style={styles.track}>
+      <View style={tarckContainer}>
         <View style={styles.content}>
           <PlayButton play={isPlaying} onPress={handlerPressPlay} />
           <View>
@@ -38,6 +54,4 @@ const Track = ({ track, isPlaying, onPlay }: ITrackProps) => {
       </View>
     </TouchableHighlight>
   );
-};
-
-export { Track };
+});

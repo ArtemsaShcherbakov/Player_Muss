@@ -7,4 +7,4 @@ interface ICurrentTrack {
 
 type TCurrentTrack = ICurrentTrack | null;
 
-export { ICurrentTrack, TCurrentTrack };
+export type { ICurrentTrack, TCurrentTrack };

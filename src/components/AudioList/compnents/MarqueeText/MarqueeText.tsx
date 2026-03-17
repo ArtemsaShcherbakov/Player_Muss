@@ -36,6 +36,7 @@ const MarqueeText = ({ text, width }: IMarqueeTextProps) => {
         numberOfLines={1}
         onLayout={(e) => setTextWidth(e.nativeEvent.layout.width)}
         style={{
+          color: "#d2cdcd",
           transform: [{ translateX }],
         }}
       >
